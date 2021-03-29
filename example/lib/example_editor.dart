@@ -594,6 +594,10 @@ class _ExampleEditorState extends State<ExampleEditor> {
 Document _createInitialDocument() {
   return MutableDocument(
     nodes: [
+      ImageNode(
+        id: DocumentEditor.createNodeId(),
+        imageUrl: 'https://i.ytimg.com/vi/fq4N0hgOWzU/maxresdefault.jpg',
+      ),
       ParagraphNode(
         id: DocumentEditor.createNodeId(),
         text: AttributedText(
@@ -603,6 +607,7 @@ Document _createInitialDocument() {
           'blockType': 'header1',
         },
       ),
+      HorizontalRuleNode(id: DocumentEditor.createNodeId()),
       ParagraphNode(
         id: DocumentEditor.createNodeId(),
         text: AttributedText(
