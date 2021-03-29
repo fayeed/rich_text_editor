@@ -1,5 +1,7 @@
 import 'dart:ui';
 
+import 'package:flutter/material.dart';
+
 /// The key in the `extensions` map that corresponds to the
 /// text style builder within the `ComponentContext` that
 /// is used to build each component in the document layout.

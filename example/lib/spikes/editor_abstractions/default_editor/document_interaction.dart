@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'dart:ui';
 
-import 'package:example/spikes/editor_abstractions/core/edit_context.dart';
+// import 'package:example/spikes/editor_abstractions/core/edit_context.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart' hide SelectableText;
 import 'package:flutter/rendering.dart';
@@ -11,6 +11,7 @@ import 'package:flutter/services.dart';
 import '../core/document.dart';
 import '../core/document_selection.dart';
 import '../core/document_layout.dart';
+import '../core/edit_context.dart';
 import '../gestures/multi_tap_gesture.dart';
 import '_text_tools.dart';
 
@@ -47,7 +48,8 @@ class DocumentInteractor extends StatefulWidget {
   _DocumentInteractorState createState() => _DocumentInteractorState();
 }
 
-class _DocumentInteractorState extends State<DocumentInteractor> with SingleTickerProviderStateMixin {
+class _DocumentInteractorState extends State<DocumentInteractor>
+    with SingleTickerProviderStateMixin {
   final _dragGutterExtent = 100;
   final _maxDragSpeed = 20;
 
@@ -76,7 +78,8 @@ class _DocumentInteractorState extends State<DocumentInteractor> with SingleTick
     _rootFocusNode = FocusNode();
     _ticker = createTicker(_onTick);
     _scrollController =
-        _scrollController = (widget.scrollController ?? ScrollController())..addListener(_updateDragSelection);
+        _scrollController = (widget.scrollController ?? ScrollController())
+          ..addListener(_updateDragSelection);
 
     widget.editContext.composer.addListener(_onSelectionChange);
   }
@@ -93,7 +96,8 @@ class _DocumentInteractorState extends State<DocumentInteractor> with SingleTick
       if (oldWidget.scrollController == null) {
         _scrollController.dispose();
       }
-      _scrollController = (widget.scrollController ?? ScrollController())..addListener(_updateDragSelection);
+      _scrollController = (widget.scrollController ?? ScrollController())
+        ..addListener(_updateDragSelection);
     }
   }
 
@@ -108,7 +112,8 @@ class _DocumentInteractorState extends State<DocumentInteractor> with SingleTick
     super.dispose();
   }
 
-  DocumentLayout get _layout => widget.documentLayoutKey.currentState as DocumentLayout;
+  DocumentLayout get _layout =>
+      widget.documentLayoutKey.currentState as DocumentLayout;
 
   void _onSelectionChange() {
     print('EditableDocument: _onSelectionChange()');
@@ -132,9 +137,15 @@ class _DocumentInteractorState extends State<DocumentInteractor> with SingleTick
     );
 
     final myBox = context.findRenderObject() as RenderBox;
-    final beyondTopExtent = min(extentRect.top - _scrollController.offset - _dragGutterExtent, 0).abs();
-    final beyondBottomExtent =
-        max(extentRect.bottom - myBox.size.height - _scrollController.offset + _dragGutterExtent, 0);
+    final beyondTopExtent =
+        min(extentRect.top - _scrollController.offset - _dragGutterExtent, 0)
+            .abs();
+    final beyondBottomExtent = max(
+        extentRect.bottom -
+            myBox.size.height -
+            _scrollController.offset +
+            _dragGutterExtent,
+        0);
 
     print('Ensuring extent is visible.');
     print(' - interaction size: ${myBox.size}');
@@ -144,8 +155,8 @@ class _DocumentInteractorState extends State<DocumentInteractor> with SingleTick
     print(' - beyond bottom: $beyondBottomExtent');
 
     if (beyondTopExtent > 0) {
-      final newScrollPosition =
-          (_scrollController.offset - beyondTopExtent).clamp(0.0, _scrollController.position.maxScrollExtent);
+      final newScrollPosition = (_scrollController.offset - beyondTopExtent)
+          .clamp(0.0, _scrollController.position.maxScrollExtent);
 
       _scrollController.animateTo(
         newScrollPosition,
@@ -153,8 +164,8 @@ class _DocumentInteractorState extends State<DocumentInteractor> with SingleTick
         curve: Curves.easeOut,
       );
     } else if (beyondBottomExtent > 0) {
-      final newScrollPosition =
-          (beyondBottomExtent + _scrollController.offset).clamp(0.0, _scrollController.position.maxScrollExtent);
+      final newScrollPosition = (beyondBottomExtent + _scrollController.offset)
+          .clamp(0.0, _scrollController.position.maxScrollExtent);
 
       _scrollController.animateTo(
         newScrollPosition,
@@ -172,7 +183,8 @@ class _DocumentInteractorState extends State<DocumentInteractor> with SingleTick
 
     ExecutionInstruction instruction = ExecutionInstruction.continueExecution;
     int index = 0;
-    while (instruction == ExecutionInstruction.continueExecution && index < widget.keyboardActions.length) {
+    while (instruction == ExecutionInstruction.continueExecution &&
+        index < widget.keyboardActions.length) {
       instruction = widget.keyboardActions[index](
         editContext: widget.editContext,
         keyEvent: keyEvent,
@@ -180,7 +192,9 @@ class _DocumentInteractorState extends State<DocumentInteractor> with SingleTick
       index += 1;
     }
 
-    return instruction == ExecutionInstruction.haltExecution ? KeyEventResult.handled : KeyEventResult.ignored;
+    return instruction == ExecutionInstruction.haltExecution
+        ? KeyEventResult.handled
+        : KeyEventResult.ignored;
   }
 
   void _onTapDown(TapDownDetails details) {
@@ -272,7 +286,8 @@ class _DocumentInteractorState extends State<DocumentInteractor> with SingleTick
     _dragStartInDoc = _getDocOffset(_dragStartInViewport);
 
     _clearSelection();
-    _dragRectInViewport = Rect.fromLTWH(_dragStartInViewport.dx, _dragStartInViewport.dy, 1, 1);
+    _dragRectInViewport =
+        Rect.fromLTWH(_dragStartInViewport.dx, _dragStartInViewport.dy, 1, 1);
   }
 
   void _onPanUpdate(DragUpdateDetails details) {
@@ -280,7 +295,8 @@ class _DocumentInteractorState extends State<DocumentInteractor> with SingleTick
     setState(() {
       _dragEndInViewport = details.localPosition;
       _dragEndInDoc = _getDocOffset(_dragEndInViewport);
-      _dragRectInViewport = Rect.fromPoints(_dragStartInViewport, _dragEndInViewport);
+      _dragRectInViewport =
+          Rect.fromPoints(_dragStartInViewport, _dragEndInViewport);
       print(' - drag rect: $_dragRectInViewport');
       _updateCursorStyle(details.localPosition);
       _updateDragSelection();
@@ -319,7 +335,8 @@ class _DocumentInteractorState extends State<DocumentInteractor> with SingleTick
     @required DocumentPosition docPosition,
     @required DocumentLayout docLayout,
   }) {
-    final newSelection = getWordSelection(docPosition: docPosition, docLayout: docLayout);
+    final newSelection =
+        getWordSelection(docPosition: docPosition, docLayout: docLayout);
     if (newSelection != null) {
       widget.editContext.composer.selection = newSelection;
       return true;
@@ -332,7 +349,8 @@ class _DocumentInteractorState extends State<DocumentInteractor> with SingleTick
     @required DocumentPosition docPosition,
     @required DocumentLayout docLayout,
   }) {
-    final newSelection = getParagraphSelection(docPosition: docPosition, docLayout: docLayout);
+    final newSelection =
+        getParagraphSelection(docPosition: docPosition, docLayout: docLayout);
     if (newSelection != null) {
       widget.editContext.composer.selection = newSelection;
       return true;
@@ -370,7 +388,8 @@ class _DocumentInteractorState extends State<DocumentInteractor> with SingleTick
     @required SelectionType selectionType,
   }) {
     print('Composer: selectionRegion(). Mode: $selectionType');
-    DocumentSelection selection = documentLayout.getDocumentSelectionInRegion(baseOffset, extentOffset);
+    DocumentSelection selection =
+        documentLayout.getDocumentSelectionInRegion(baseOffset, extentOffset);
     DocumentPosition basePosition = selection?.base;
     DocumentPosition extentPosition = selection?.extent;
     print(' - base: $basePosition, extent: $extentPosition');
@@ -385,13 +404,16 @@ class _DocumentInteractorState extends State<DocumentInteractor> with SingleTick
         docPosition: basePosition,
         docLayout: documentLayout,
       );
-      basePosition = baseOffset.dy < extentOffset.dy ? baseParagraphSelection.base : baseParagraphSelection.extent;
+      basePosition = baseOffset.dy < extentOffset.dy
+          ? baseParagraphSelection.base
+          : baseParagraphSelection.extent;
       final extentParagraphSelection = getParagraphSelection(
         docPosition: extentPosition,
         docLayout: documentLayout,
       );
-      extentPosition =
-          baseOffset.dy < extentOffset.dy ? extentParagraphSelection.extent : extentParagraphSelection.base;
+      extentPosition = baseOffset.dy < extentOffset.dy
+          ? extentParagraphSelection.extent
+          : extentParagraphSelection.base;
     } else if (selectionType == SelectionType.word) {
       print(' - selecting a word');
       final baseWordSelection = getWordSelection(
@@ -424,7 +446,8 @@ class _DocumentInteractorState extends State<DocumentInteractor> with SingleTick
 
     if (desiredCursor != null && desiredCursor != _cursorStyle.value) {
       _cursorStyle.value = desiredCursor;
-    } else if (desiredCursor == null && _cursorStyle.value != SystemMouseCursors.basic) {
+    } else if (desiredCursor == null &&
+        _cursorStyle.value != SystemMouseCursors.basic) {
       _cursorStyle.value = SystemMouseCursors.basic;
     }
   }
@@ -432,7 +455,8 @@ class _DocumentInteractorState extends State<DocumentInteractor> with SingleTick
   // Given an `offset` within this `EditableDocument`, returns that `offset`
   // in the coordinate space of the `DocumentLayout` for the rich text document.
   Offset _getDocOffset(Offset offset) {
-    final docBox = widget.documentLayoutKey.currentContext.findRenderObject() as RenderBox;
+    final docBox =
+        widget.documentLayoutKey.currentContext.findRenderObject() as RenderBox;
     return docBox.globalToLocal(offset, ancestor: context.findRenderObject());
   }
 
@@ -443,8 +467,8 @@ class _DocumentInteractorState extends State<DocumentInteractor> with SingleTick
   /// form of mouse scrolling.
   void _onPointerSignal(PointerSignalEvent event) {
     if (event is PointerScrollEvent) {
-      final newScrollOffset =
-          (_scrollController.offset + event.scrollDelta.dy).clamp(0.0, _scrollController.position.maxScrollExtent);
+      final newScrollOffset = (_scrollController.offset + event.scrollDelta.dy)
+          .clamp(0.0, _scrollController.position.maxScrollExtent);
       _scrollController.jumpTo(newScrollOffset);
 
       _updateDragSelection();
@@ -515,12 +539,14 @@ class _DocumentInteractorState extends State<DocumentInteractor> with SingleTick
   }
 
   void _scrollDown() {
-    if (_scrollController.offset >= _scrollController.position.maxScrollExtent) {
+    if (_scrollController.offset >=
+        _scrollController.position.maxScrollExtent) {
       return;
     }
 
     final editorBox = context.findRenderObject() as RenderBox;
-    final gutterAmount = (editorBox.size.height - _dragEndInViewport.dy).clamp(0.0, _dragGutterExtent);
+    final gutterAmount = (editorBox.size.height - _dragEndInViewport.dy)
+        .clamp(0.0, _dragGutterExtent);
     final speedPercent = 1.0 - (gutterAmount / _dragGutterExtent);
     final scrollAmount = lerpDouble(0, _maxDragSpeed, speedPercent);
 
@@ -548,7 +574,9 @@ class _DocumentInteractorState extends State<DocumentInteractor> with SingleTick
                   document: widget.child,
                 ),
                 Positioned.fill(
-                  child: widget.showDebugPaint ? _buildDragSelection() : SizedBox(),
+                  child: widget.showDebugPaint
+                      ? _buildDragSelection()
+                      : SizedBox(),
                 ),
               ],
             ),
@@ -573,43 +601,60 @@ class _DocumentInteractorState extends State<DocumentInteractor> with SingleTick
       shortcuts: <LogicalKeySet, Intent>{
         // Up arrow
         LogicalKeySet(LogicalKeyboardKey.arrowUp): DoNothingIntent(),
-        LogicalKeySet(LogicalKeyboardKey.arrowUp, LogicalKeyboardKey.shift): DoNothingIntent(),
-        LogicalKeySet(LogicalKeyboardKey.arrowUp, LogicalKeyboardKey.alt): DoNothingIntent(),
-        LogicalKeySet(LogicalKeyboardKey.arrowUp, LogicalKeyboardKey.shift, LogicalKeyboardKey.alt): DoNothingIntent(),
-        LogicalKeySet(LogicalKeyboardKey.arrowUp, LogicalKeyboardKey.meta): DoNothingIntent(),
-        LogicalKeySet(LogicalKeyboardKey.arrowUp, LogicalKeyboardKey.meta, LogicalKeyboardKey.alt): DoNothingIntent(),
-        LogicalKeySet(LogicalKeyboardKey.arrowUp, LogicalKeyboardKey.shift, LogicalKeyboardKey.meta): DoNothingIntent(),
+        LogicalKeySet(LogicalKeyboardKey.arrowUp, LogicalKeyboardKey.shift):
+            DoNothingIntent(),
+        LogicalKeySet(LogicalKeyboardKey.arrowUp, LogicalKeyboardKey.alt):
+            DoNothingIntent(),
+        LogicalKeySet(LogicalKeyboardKey.arrowUp, LogicalKeyboardKey.shift,
+            LogicalKeyboardKey.alt): DoNothingIntent(),
+        LogicalKeySet(LogicalKeyboardKey.arrowUp, LogicalKeyboardKey.meta):
+            DoNothingIntent(),
+        LogicalKeySet(LogicalKeyboardKey.arrowUp, LogicalKeyboardKey.meta,
+            LogicalKeyboardKey.alt): DoNothingIntent(),
+        LogicalKeySet(LogicalKeyboardKey.arrowUp, LogicalKeyboardKey.shift,
+            LogicalKeyboardKey.meta): DoNothingIntent(),
         // Down arrow
         LogicalKeySet(LogicalKeyboardKey.arrowDown): DoNothingIntent(),
-        LogicalKeySet(LogicalKeyboardKey.arrowDown, LogicalKeyboardKey.shift): DoNothingIntent(),
-        LogicalKeySet(LogicalKeyboardKey.arrowDown, LogicalKeyboardKey.alt): DoNothingIntent(),
-        LogicalKeySet(LogicalKeyboardKey.arrowDown, LogicalKeyboardKey.shift, LogicalKeyboardKey.alt):
+        LogicalKeySet(LogicalKeyboardKey.arrowDown, LogicalKeyboardKey.shift):
             DoNothingIntent(),
-        LogicalKeySet(LogicalKeyboardKey.arrowDown, LogicalKeyboardKey.meta): DoNothingIntent(),
-        LogicalKeySet(LogicalKeyboardKey.arrowDown, LogicalKeyboardKey.meta, LogicalKeyboardKey.alt): DoNothingIntent(),
-        LogicalKeySet(LogicalKeyboardKey.arrowDown, LogicalKeyboardKey.shift, LogicalKeyboardKey.meta):
+        LogicalKeySet(LogicalKeyboardKey.arrowDown, LogicalKeyboardKey.alt):
             DoNothingIntent(),
+        LogicalKeySet(LogicalKeyboardKey.arrowDown, LogicalKeyboardKey.shift,
+            LogicalKeyboardKey.alt): DoNothingIntent(),
+        LogicalKeySet(LogicalKeyboardKey.arrowDown, LogicalKeyboardKey.meta):
+            DoNothingIntent(),
+        LogicalKeySet(LogicalKeyboardKey.arrowDown, LogicalKeyboardKey.meta,
+            LogicalKeyboardKey.alt): DoNothingIntent(),
+        LogicalKeySet(LogicalKeyboardKey.arrowDown, LogicalKeyboardKey.shift,
+            LogicalKeyboardKey.meta): DoNothingIntent(),
         // Left arrow
         LogicalKeySet(LogicalKeyboardKey.arrowLeft): DoNothingIntent(),
-        LogicalKeySet(LogicalKeyboardKey.arrowLeft, LogicalKeyboardKey.shift): DoNothingIntent(),
-        LogicalKeySet(LogicalKeyboardKey.arrowLeft, LogicalKeyboardKey.alt): DoNothingIntent(),
-        LogicalKeySet(LogicalKeyboardKey.arrowLeft, LogicalKeyboardKey.shift, LogicalKeyboardKey.alt):
+        LogicalKeySet(LogicalKeyboardKey.arrowLeft, LogicalKeyboardKey.shift):
             DoNothingIntent(),
-        LogicalKeySet(LogicalKeyboardKey.arrowLeft, LogicalKeyboardKey.meta): DoNothingIntent(),
-        LogicalKeySet(LogicalKeyboardKey.arrowLeft, LogicalKeyboardKey.meta, LogicalKeyboardKey.alt): DoNothingIntent(),
-        LogicalKeySet(LogicalKeyboardKey.arrowLeft, LogicalKeyboardKey.shift, LogicalKeyboardKey.meta):
+        LogicalKeySet(LogicalKeyboardKey.arrowLeft, LogicalKeyboardKey.alt):
             DoNothingIntent(),
+        LogicalKeySet(LogicalKeyboardKey.arrowLeft, LogicalKeyboardKey.shift,
+            LogicalKeyboardKey.alt): DoNothingIntent(),
+        LogicalKeySet(LogicalKeyboardKey.arrowLeft, LogicalKeyboardKey.meta):
+            DoNothingIntent(),
+        LogicalKeySet(LogicalKeyboardKey.arrowLeft, LogicalKeyboardKey.meta,
+            LogicalKeyboardKey.alt): DoNothingIntent(),
+        LogicalKeySet(LogicalKeyboardKey.arrowLeft, LogicalKeyboardKey.shift,
+            LogicalKeyboardKey.meta): DoNothingIntent(),
         // Right arrow
         LogicalKeySet(LogicalKeyboardKey.arrowRight): DoNothingIntent(),
-        LogicalKeySet(LogicalKeyboardKey.arrowRight, LogicalKeyboardKey.shift): DoNothingIntent(),
-        LogicalKeySet(LogicalKeyboardKey.arrowRight, LogicalKeyboardKey.alt): DoNothingIntent(),
-        LogicalKeySet(LogicalKeyboardKey.arrowRight, LogicalKeyboardKey.shift, LogicalKeyboardKey.alt):
+        LogicalKeySet(LogicalKeyboardKey.arrowRight, LogicalKeyboardKey.shift):
             DoNothingIntent(),
-        LogicalKeySet(LogicalKeyboardKey.arrowRight, LogicalKeyboardKey.meta): DoNothingIntent(),
-        LogicalKeySet(LogicalKeyboardKey.arrowRight, LogicalKeyboardKey.meta, LogicalKeyboardKey.alt):
+        LogicalKeySet(LogicalKeyboardKey.arrowRight, LogicalKeyboardKey.alt):
             DoNothingIntent(),
-        LogicalKeySet(LogicalKeyboardKey.arrowRight, LogicalKeyboardKey.shift, LogicalKeyboardKey.meta):
+        LogicalKeySet(LogicalKeyboardKey.arrowRight, LogicalKeyboardKey.shift,
+            LogicalKeyboardKey.alt): DoNothingIntent(),
+        LogicalKeySet(LogicalKeyboardKey.arrowRight, LogicalKeyboardKey.meta):
             DoNothingIntent(),
+        LogicalKeySet(LogicalKeyboardKey.arrowRight, LogicalKeyboardKey.meta,
+            LogicalKeyboardKey.alt): DoNothingIntent(),
+        LogicalKeySet(LogicalKeyboardKey.arrowRight, LogicalKeyboardKey.shift,
+            LogicalKeyboardKey.meta): DoNothingIntent(),
         // Misc keys
         LogicalKeySet(LogicalKeyboardKey.enter): DoNothingIntent(),
         LogicalKeySet(LogicalKeyboardKey.backspace): DoNothingIntent(),
@@ -650,7 +695,8 @@ class _DocumentInteractorState extends State<DocumentInteractor> with SingleTick
         child: RawGestureDetector(
           behavior: HitTestBehavior.translucent,
           gestures: <Type, GestureRecognizerFactory>{
-            TapSequenceGestureRecognizer: GestureRecognizerFactoryWithHandlers<TapSequenceGestureRecognizer>(
+            TapSequenceGestureRecognizer: GestureRecognizerFactoryWithHandlers<
+                TapSequenceGestureRecognizer>(
               () => TapSequenceGestureRecognizer(),
               (TapSequenceGestureRecognizer recognizer) {
                 recognizer
@@ -661,7 +707,8 @@ class _DocumentInteractorState extends State<DocumentInteractor> with SingleTick
                   ..onTripleTap = _onTripleTap;
               },
             ),
-            PanGestureRecognizer: GestureRecognizerFactoryWithHandlers<PanGestureRecognizer>(
+            PanGestureRecognizer:
+                GestureRecognizerFactoryWithHandlers<PanGestureRecognizer>(
               () => PanGestureRecognizer(),
               (PanGestureRecognizer recognizer) {
                 recognizer

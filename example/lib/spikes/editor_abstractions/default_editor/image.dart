@@ -40,7 +40,9 @@ class ImageNode with ChangeNotifier implements DocumentNode {
   String copyContent(dynamic selection) {
     assert(selection is BinarySelection);
 
-    return (selection as BinarySelection).position == BinaryPosition.included() ? _imageUrl : null;
+    return (selection as BinarySelection).position == BinaryPosition.included()
+        ? _imageUrl
+        : null;
   }
 }
 
@@ -67,7 +69,7 @@ class ImageComponent extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             border: Border.all(
-              width: 1,
+              width: 10,
               color: isSelected ? selectionColor : Colors.transparent,
             ),
           ),
@@ -86,14 +88,17 @@ Widget imageBuilder(ComponentContext componentContext) {
     return null;
   }
 
-  final selection =
-      componentContext.nodeSelection == null ? null : componentContext.nodeSelection.nodeSelection as BinarySelection;
+  final selection = componentContext.nodeSelection == null
+      ? null
+      : componentContext.nodeSelection.nodeSelection as BinarySelection;
   final isSelected = selection != null && selection.position.isIncluded;
 
   return ImageComponent(
     componentKey: componentContext.componentKey,
     imageUrl: (componentContext.currentNode as ImageNode).imageUrl,
     isSelected: isSelected,
-    selectionColor: (componentContext.extensions[selectionStylesExtensionKey] as SelectionStyle).selectionColor,
+    selectionColor: (componentContext.extensions[selectionStylesExtensionKey]
+            as SelectionStyle)
+        .selectionColor,
   );
 }

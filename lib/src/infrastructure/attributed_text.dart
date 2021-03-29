@@ -67,20 +67,23 @@ class AttributedText {
   /// Adds the given attribution to all characters within the given
   /// `range`, inclusive.
   void addAttribution(dynamic attribution, TextRange range) {
-    spans.addAttribution(newAttribution: attribution, start: range.start, end: range.end);
+    spans.addAttribution(
+        newAttribution: attribution, start: range.start, end: range.end);
   }
 
   /// Removes the given attribution from all characters within the
   /// given `range`, inclusive.
   void removeAttribution(dynamic attribution, TextRange range) {
-    spans.addAttribution(newAttribution: attribution, start: range.start, end: range.end);
+    spans.addAttribution(
+        newAttribution: attribution, start: range.start, end: range.end);
   }
 
   /// If ALL of the text in `range`, inclusive, contains the given `attribution`,
   /// that attribution is removed from the text in `range`, inclusive.
   /// Otherwise, all of the text in `range`, inclusive, is given the `attribution`.
   void toggleAttribution(dynamic attribution, TextRange range) {
-    spans.toggleAttribution(attribution: attribution, start: range.start, end: range.end);
+    spans.toggleAttribution(
+        attribution: attribution, start: range.start, end: range.end);
   }
 
   /// Copies all text and attributions from `startOffset` to
@@ -90,7 +93,8 @@ class AttributedText {
 
     // Note: -1 because copyText() uses an exclusive `start` and `end` but
     // _copyAttributionRegion() uses an inclusive `start` and `end`.
-    final startCopyOffset = startOffset < text.length ? startOffset : text.length - 1;
+    final startCopyOffset =
+        startOffset < text.length ? startOffset : text.length - 1;
     int endCopyOffset;
     if (endOffset == startOffset) {
       endCopyOffset = startCopyOffset;
@@ -99,7 +103,8 @@ class AttributedText {
     } else {
       endCopyOffset = text.length - 1;
     }
-    _log.log('copyText', 'offsets, start: $startCopyOffset, end: $endCopyOffset');
+    _log.log(
+        'copyText', 'offsets, start: $startCopyOffset, end: $endCopyOffset');
 
     return AttributedText(
       text: text.substring(startOffset, endOffset),
@@ -113,14 +118,16 @@ class AttributedText {
     _log.log('copyAndAppend', 'our attributions before pushing them:');
     _log.log('copyAndAppend', spans.toString());
     if (other.text.isEmpty) {
-      _log.log('copyAndAppend', '`other` has no text. Returning a direct copy of ourselves.');
+      _log.log('copyAndAppend',
+          '`other` has no text. Returning a direct copy of ourselves.');
       return AttributedText(
         text: text,
         spans: spans.copy(),
       );
     }
 
-    final newSpans = spans.copy()..addAt(other: other.spans, index: text.length);
+    final newSpans = spans.copy()
+      ..addAt(other: other.spans, index: text.length);
     return AttributedText(
       text: text + other.text,
       spans: newSpans,
@@ -138,7 +145,8 @@ class AttributedText {
     required int startOffset,
     Set<dynamic> applyAttributions = const {},
   }) {
-    _log.log('insertString', 'text: "$textToInsert", start: $startOffset, attributions: $applyAttributions');
+    _log.log('insertString',
+        'text: "$textToInsert", start: $startOffset, attributions: $applyAttributions');
 
     _log.log('insertString', 'copying text to the left');
     final startText = this.copyText(0, startOffset);
@@ -158,7 +166,8 @@ class AttributedText {
     }
     _log.log('insertString', 'insertedText: $insertedText');
 
-    _log.log('insertString', 'combining left text, insertion text, and right text');
+    _log.log(
+        'insertString', 'combining left text, insertion text, and right text');
     return startText.copyAndAppend(insertedText).copyAndAppend(endText);
   }
 
@@ -169,11 +178,13 @@ class AttributedText {
     required int startOffset,
     required int endOffset,
   }) {
-    _log.log('removeRegion', 'Removing text region from $startOffset to $endOffset');
+    _log.log(
+        'removeRegion', 'Removing text region from $startOffset to $endOffset');
     _log.log('removeRegion', 'initial attributions:');
     _log.log('removeRegion', spans.toString());
-    final reducedText = (startOffset > 0 ? text.substring(0, startOffset) : '') +
-        (endOffset < text.length ? text.substring(endOffset) : '');
+    final reducedText =
+        (startOffset > 0 ? text.substring(0, startOffset) : '') +
+            (endOffset < text.length ? text.substring(endOffset) : '');
 
     AttributedSpans contractedAttributions = spans.copy()
       ..contractAttributions(
@@ -207,9 +218,11 @@ class AttributedText {
     }
 
     final collapsedSpans = spans.collapseSpans(contentLength: text.length);
+    print('$collapsedSpans');
     final textSpans = collapsedSpans
         .map((attributedSpan) => TextSpan(
-              text: text.substring(attributedSpan.start, attributedSpan.end + 1),
+              text:
+                  text.substring(attributedSpan.start, attributedSpan.end + 1),
               style: styleBuilder(attributedSpan.attributions),
             ))
         .toList();

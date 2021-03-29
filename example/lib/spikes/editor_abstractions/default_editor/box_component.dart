@@ -1,4 +1,4 @@
-import 'package:example/spikes/editor_abstractions/core/edit_context.dart';
+// import 'package:example/spikes/editor_abstractions/core/edit_context.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/src/rendering/mouse_cursor.dart';
 import 'package:flutter/widgets.dart';
@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 import '../core/document.dart';
 import '../core/document_layout.dart';
 import '../core/document_selection.dart';
+import '../core/edit_context.dart';
 import 'document_interaction.dart';
 import 'multi_node_editing.dart';
 
@@ -33,13 +34,15 @@ class _BoxComponentState extends State<BoxComponent> with DocumentComponent {
   }
 
   @override
-  BinaryPosition movePositionLeft(dynamic currentPosition, [Map<String, dynamic> movementModifiers]) {
+  BinaryPosition movePositionLeft(dynamic currentPosition,
+      [Map<String, dynamic> movementModifiers]) {
     // BoxComponents don't support internal movement.
     return null;
   }
 
   @override
-  BinaryPosition movePositionRight(dynamic currentPosition, [Map<String, dynamic> movementModifiers]) {
+  BinaryPosition movePositionRight(dynamic currentPosition,
+      [Map<String, dynamic> movementModifiers]) {
     // BoxComponents don't support internal movement.
     return null;
   }
@@ -115,7 +118,8 @@ class _BoxComponentState extends State<BoxComponent> with DocumentComponent {
   }
 
   @override
-  BinarySelection getSelectionInRange(Offset localBaseOffset, Offset localExtentOffset) {
+  BinarySelection getSelectionInRange(
+      Offset localBaseOffset, Offset localExtentOffset) {
     return BinarySelection.all();
   }
 
@@ -139,7 +143,9 @@ class BinaryPosition {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is BinaryPosition && runtimeType == other.runtimeType && isIncluded == other.isIncluded;
+      other is BinaryPosition &&
+          runtimeType == other.runtimeType &&
+          isIncluded == other.isIncluded;
 
   @override
   int get hashCode => isIncluded.hashCode;
@@ -156,7 +162,9 @@ class BinarySelection {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is BinarySelection && runtimeType == other.runtimeType && position == other.position;
+      other is BinarySelection &&
+          runtimeType == other.runtimeType &&
+          position == other.position;
 
   @override
   int get hashCode => position.hashCode;
@@ -166,7 +174,8 @@ ExecutionInstruction deleteBoxWhenBackspaceOrDeleteIsPressed({
   @required EditContext editContext,
   @required RawKeyEvent keyEvent,
 }) {
-  if (keyEvent.logicalKey != LogicalKeyboardKey.backspace && keyEvent.logicalKey != LogicalKeyboardKey.delete) {
+  if (keyEvent.logicalKey != LogicalKeyboardKey.backspace &&
+      keyEvent.logicalKey != LogicalKeyboardKey.delete) {
     return ExecutionInstruction.continueExecution;
   }
   if (editContext.composer.selection == null) {
@@ -178,13 +187,15 @@ ExecutionInstruction deleteBoxWhenBackspaceOrDeleteIsPressed({
   if (editContext.composer.selection.extent.nodePosition is! BinaryPosition) {
     return ExecutionInstruction.continueExecution;
   }
-  if (!(editContext.composer.selection.extent.nodePosition as BinaryPosition).isIncluded) {
+  if (!(editContext.composer.selection.extent.nodePosition as BinaryPosition)
+      .isIncluded) {
     return ExecutionInstruction.continueExecution;
   }
 
   print('Deleting a box component');
 
-  final node = editContext.editor.document.getNode(editContext.composer.selection.extent);
+  final node = editContext.editor.document
+      .getNode(editContext.composer.selection.extent);
   final newSelectionPosition = _getAnotherSelectionAfterNodeDeletion(
     document: editContext.editor.document,
     documentLayout: editContext.documentLayout,

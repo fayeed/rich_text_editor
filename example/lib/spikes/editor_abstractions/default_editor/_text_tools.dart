@@ -1,8 +1,9 @@
-import 'package:example/spikes/editor_abstractions/core/document_layout.dart';
+// import 'package:example/spikes/editor_abstractions/core/document_layout.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import '../core/document.dart';
+import '../core/document_layout.dart';
 import '../core/document_selection.dart';
 import 'text.dart';
 
@@ -35,7 +36,8 @@ DocumentSelection getWordSelection({
 
   final component = docLayout.getComponentByNodeId(docPosition.nodeId);
   if (component is TextComposable) {
-    final TextSelection wordSelection = (component as TextComposable).getWordSelectionAt(docPosition.nodePosition);
+    final TextSelection wordSelection = (component as TextComposable)
+        .getWordSelectionAt(docPosition.nodePosition);
 
     print(' - word selection: $wordSelection');
     return DocumentSelection(
@@ -63,7 +65,8 @@ DocumentSelection getParagraphSelection({
   final component = docLayout.getComponentByNodeId(docPosition.nodeId);
   if (component is TextComposable) {
     final TextSelection wordSelection = _expandPositionToParagraph(
-      text: (component as TextComposable).getContiguousTextAt(docPosition.nodePosition),
+      text: (component as TextComposable)
+          .getContiguousTextAt(docPosition.nodePosition),
       textPosition: docPosition.nodePosition as TextPosition,
     );
 
