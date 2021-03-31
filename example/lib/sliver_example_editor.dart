@@ -1,17 +1,17 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_richtext/flutter_richtext.dart';
 
-/// Example of a rich text editor.
+/// Example editor to show how the Rich Text Editor is working.
 ///
-/// This editor will expand in functionality as the rich text
-/// package expands.
-class ExampleEditor extends StatefulWidget {
+/// As the editor has an internal scrolling mechanism, for using it with Slivers
+/// you need to give them a finite height or space to fill itself. That is why
+/// the [Editor] has a [SizedBox] wrapped around it to give a height.
+class SliverExampleEditor extends StatefulWidget {
   @override
-  _ExampleEditorState createState() => _ExampleEditorState();
+  _SliverExampleEditorState createState() => _SliverExampleEditorState();
 }
 
-class _ExampleEditorState extends State<ExampleEditor> {
+class _SliverExampleEditorState extends State<SliverExampleEditor> {
   Document _doc;
   DocumentEditor _docEditor;
 
@@ -29,10 +29,61 @@ class _ExampleEditorState extends State<ExampleEditor> {
 
   @override
   Widget build(BuildContext context) {
-    return Editor.standard(
-      editor: _docEditor,
-      maxWidth: 600,
-      padding: const EdgeInsets.symmetric(vertical: 56, horizontal: 24),
+    return CustomScrollView(
+      slivers: [
+        SliverAppBar(
+          title: Text(
+            'Rich Text Editor Sliver Example',
+          ),
+          expandedHeight: 200.0,
+          leading: SizedBox(),
+          flexibleSpace: FlexibleSpaceBar(
+            background: Image.network(
+              'https://i.ytimg.com/vi/fq4N0hgOWzU/maxresdefault.jpg',
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+        SliverToBoxAdapter(
+          child: Text(
+            'Lorem Ipsum Dolor',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 72,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        SliverToBoxAdapter(
+          child: IntrinsicHeight(
+            child: Editor.standard(
+              editor: _docEditor,
+              padding: const EdgeInsets.symmetric(vertical: 56, horizontal: 24),
+            ),
+          ),
+        ),
+        SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (BuildContext context, int index) {
+              return ListTile(
+                title: Text('$index'),
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'SliverList element tapped with index $index.',
+                      ),
+                      duration: Duration(milliseconds: 500),
+                    ),
+                  );
+                },
+              );
+            },
+            // Or, uncomment the following line:
+            // childCount: 3,
+          ),
+        ),
+      ],
     );
   }
 }
@@ -61,47 +112,11 @@ Document _createInitialDocument() {
               'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus sed sagittis urna. Aenean mattis ante justo, quis sollicitudin metus interdum id. Aenean ornare urna ac enim consequat mollis. In aliquet convallis efficitur. Phasellus convallis purus in fringilla scelerisque. Ut ac orci a turpis egestas lobortis. Morbi aliquam dapibus sem, vitae sodales arcu ultrices eu. Duis vulputate mauris quam, eleifend pulvinar quam blandit eget.',
         ),
       ),
-      ListItemNode.unordered(
-        id: DocumentEditor.createNodeId(),
-        text: AttributedText(
-          text: 'This is an unordered list item',
-        ),
-      ),
-      ListItemNode.unordered(
-        id: DocumentEditor.createNodeId(),
-        text: AttributedText(
-          text: 'This is another list item',
-        ),
-      ),
-      ListItemNode.unordered(
-        id: DocumentEditor.createNodeId(),
-        text: AttributedText(
-          text: 'This is a 3rd list item',
-        ),
-      ),
       ParagraphNode(
         id: DocumentEditor.createNodeId(),
         text: AttributedText(
             text:
                 'Cras vitae sodales nisi. Vivamus dignissim vel purus vel aliquet. Sed viverra diam vel nisi rhoncus pharetra. Donec gravida ut ligula euismod pharetra. Etiam sed urna scelerisque, efficitur mauris vel, semper arcu. Nullam sed vehicula sapien. Donec id tellus volutpat, eleifend nulla eget, rutrum mauris.'),
-      ),
-      ListItemNode.ordered(
-        id: DocumentEditor.createNodeId(),
-        text: AttributedText(
-          text: 'First thing to do',
-        ),
-      ),
-      ListItemNode.ordered(
-        id: DocumentEditor.createNodeId(),
-        text: AttributedText(
-          text: 'Second thing to do',
-        ),
-      ),
-      ListItemNode.ordered(
-        id: DocumentEditor.createNodeId(),
-        text: AttributedText(
-          text: 'Third thing to do',
-        ),
       ),
       ParagraphNode(
         id: DocumentEditor.createNodeId(),
